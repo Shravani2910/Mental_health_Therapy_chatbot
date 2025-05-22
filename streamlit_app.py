@@ -1,5 +1,4 @@
 import streamlit as st
-import joblib
 import os
 import requests
 from PIL import Image
@@ -24,13 +23,6 @@ st.image(logo, width=120)
 #st.markdown("<h1 style='text-align: center; color: #20B2AA;h1>", unsafe_allow_html=True)Dr.Brainee</h1>", unsafe_allow_html=True)
 
 
-@st.cache_resource
-def load_model():
-    return joblib.load("sentiment_svc_model.joblib")
-
-@st.cache_resource
-def load_vectorizer():
-    return joblib.load("tfidf_vectorizer.joblib")
 
 @st.cache_resource
 def initialize_llm():
@@ -46,20 +38,18 @@ def load_vector_db():
     return Chroma(persist_directory="/content/chroma_db", embedding_function=embeddings)
 
 # --- Preprocessing function ---
-def clean_text(text):
-    text = text.lower()
-    text = "".join([char for char in text if char not in string.punctuation])
-    text = " ".join([word for word in text.split() if word not in stopwords.words('english')])
-    lemmatizer = WordNetLemmatizer()
-    text = " ".join([lemmatizer.lemmatize(word) for word in text.split()])
-    return text
 
 # --- Set up LangChain QA pipeline ---
 def setup_qa_chain(vector_db, llm):
-    prompt_templates = """You are a compassionate mental health chatbot. Respond thoughtfully to the following question:
+    prompt_templates = """ You are a compassionate mental health chatbot.
+First, give the sentiment of the user query, then respond thoughtfully.
+
+Context:
 {context}
+
 User: {question}
-Chatbot:"""
+Chatbot:
+"""
     PROMPT = PromptTemplate(template=prompt_templates, input_variables=['context', 'question'])
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
@@ -101,18 +91,11 @@ def main():
 
     if st.button("Submit") and user_input.strip():
         with st.spinner("Analyzing..."):
-            model = load_model()
-            vectorizer = load_vectorizer()
             llm = initialize_llm()
             vector_db = load_vector_db()
             qa_chain = setup_qa_chain(vector_db, llm)
-
-            cleaned = clean_text(user_input)
-            features = vectorizer.transform([cleaned])
-            emotion = model.predict(features)[0]
             response = qa_chain.run(user_input)
-
-        st.success(f"**Predicted Emotional Status**: {emotion}")
+            
         st.markdown("**Chatbot Response:**")
         st.write(response)
 
