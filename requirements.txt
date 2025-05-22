@@ -1,2 +1,13 @@
 streamlit
+pyngrok
+pandas
+numpy
+scikit-learn
+nltk
+langchain
 openai
+chromadb
+tqdm
+matplotlib
+transformers
+sentence-transformers
