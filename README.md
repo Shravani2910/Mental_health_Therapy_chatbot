@@ -45,3 +45,7 @@ The chatbot is **not a replacement for professional therapy**, but a supplementa
 
 ## Other Collaborators:
 
+- [@suyashmarathe512](https://github.com/suyashmarathe512)
+- [@KishanPatil01](https://github.com/KishanPatil01)
+- [@Ankitvpatil1](https://github.com/Ankitvpatil1)
+
